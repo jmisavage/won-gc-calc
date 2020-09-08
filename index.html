@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <title>WoN GC Calculator</title>
+        <meta name="viewport" content="width=device-width" />
+        <style>
+			html {
+				font-size: 20px;
+			}
+            body {
+                color: #ddd;
+                background: #222;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+				padding: 1em;
+            }
+
+            .container {
+                max-width: 480px;
+                margin: 0 auto;
+            }
+
+            h1 {
+                font-weight: 200;
+				margin: 0 0 1rem;
+            }
+
+			p {
+				font-size: 0.8rem;
+				margin: 0 0 1rem;
+			}
+
+			.fine {
+				font-size: 0.8rem;
+			}
+
+            form {
+                display: grid;
+                grid-template-columns: 1fr auto auto;
+                grid-template-rows: auto;
+                grid-gap: 1em;
+            }
+
+            input[type="number"] {
+                width: 60px;
+                font-size: 1em;
+                text-align: right;
+            }
+
+			.breaks {
+				display: flex;
+				width: 100%;
+			}
+
+            #rest-period {
+                flex: 1 0 auto;
+				text-align: right;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+			<h1>GC Calculator</h1>
+			<p>A utility to calculate how much time you have before you need to declare.  If invites are maxed out you should declare right away and post on GroupMe.</p>
+
+            <form id="form">
+                <div></div>
+                <div>hrs</div>
+                <div>mins</div>
+                <label>Event Ends In:</label>
+
+                <input
+                    id="event-end-hr"
+                    type="number"
+                    min="0"
+                    max="48"
+                    value="48"
+                />
+                <input
+                    id="event-end-min"
+                    type="number"
+                    min="0"
+                    max="59"
+                    value="0"
+                />
+
+                <label>Next Invite</label>
+                <input
+                    id="next-invite-hr"
+                    type="number"
+                    min="0"
+                    max="2"
+                    value="0"
+                />
+
+                <input
+                    id="next-invite-min"
+                    type="number"
+                    min="0"
+                    max="59"
+                    value="0"
+                />
+
+                <label>War Invitations</label>
+                <span></span>
+                <input
+                    id="invitations"
+                    type="number"
+                    min="0"
+                    max="6"
+                    value="6"
+                />
+            </form>
+
+			<hr />
+			<div class="breaks">
+				<div>Break between wars </div>
+				<span id="rest-period"></span>
+			</div>
+            
+        </div>
+
+        <script>
+            var form = document.getElementById("form");
+            var rest = document.getElementById("rest-period");
+
+            calc();
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+            });
+
+            form.addEventListener("change", calc);
+
+            function calc() {
+                var eventEndMinutes =
+                    Number(form.elements["event-end-hr"].value) * 60;
+                eventEndMinutes += Number(form.elements["event-end-min"].value);
+
+                var nextInviteMinutes =
+                    Number(form.elements["next-invite-hr"].value) * 60;
+                nextInviteMinutes += Number(
+                    form.elements["next-invite-min"].value
+                );
+
+                var remainingInviteMinutes =
+                    eventEndMinutes - nextInviteMinutes;
+
+                var remaining = Math.ceil(
+                    remainingInviteMinutes / 120 +
+                        Number(form.elements["invitations"].value)
+                );
+
+                var remainingWarMinutes = remaining * 30;
+
+                var breakLength =
+                    (eventEndMinutes - remainingWarMinutes) / (remaining - 1);
+
+				rest.innerHTML = `
+					${Math.floor(breakLength / 60)} hr ${Math.floor(breakLength % 60)} min
+					<div class="fine">(${Math.floor(breakLength)} min)</div>
+				`;
+            }
+        </script>
+    </body>
+</html>
